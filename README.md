@@ -36,8 +36,8 @@ spring:
 ```
 import java.util.Map;
 
-import org.liunxprobe.spring.datasource.MultiDataSource;
-import org.liunxprobe.spring.datasource.aop.DataSourceAop;
+import MultiDataSource;
+import DataSourceSwitch;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -86,7 +86,7 @@ import org.linuxprobe.crud.core.query.Page;
 import org.linuxprobe.universalcrudspringbootdemo.model.Permission;
 import org.linuxprobe.universalcrudspringbootdemo.query.PermissionQuery;
 import org.linuxprobe.universalcrudspringbootdemo.service.PermissonService;
-import org.liunxprobe.spring.datasource.annotation.DataSource;
+import DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -99,21 +99,21 @@ public class PermissionController {
 	private PermissonService service;
         // 标记从库,会启用负载均衡
 	@GetMapping("/getPageInfo")
-	@DataSource(slave = true)
+	@DataSourceSwitch(slave = true)
 	public Page<Permission> getPageInfo(PermissionQuery param) {
 		return this.service.getPageInfo(param);
 	}
 
         // 标记主库
 	@GetMapping("/getPageInfo2")
-	@DataSource
+	@DataSourceSwitch
 	public Page<Permission> getPageInfo2(PermissionQuery param) {
 		return this.service.getPageInfo(param);
 	}
 	
 	// 标记指定库
 	@GetMapping("/getPageInfo3")
-	@DataSource(value = "slave1")
+	@DataSourceSwitch(value = "slave1")
 	public Page<Permission> getPageInfo3(PermissionQuery param) {
 		return this.service.getPageInfo(param);
 	}
