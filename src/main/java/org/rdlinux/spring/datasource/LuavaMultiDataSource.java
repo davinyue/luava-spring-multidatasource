@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class LuavaMultiDataSource extends AbstractRoutingDataSource {
     private final static Logger logger = LoggerFactory.getLogger(LuavaMultiDataSource.class);
-    private final ThreadLocal<String> contextHolder = new ThreadLocal<>();
+    private final ThreadLocal<String> CURRENT_DATASOURCE_KEY_TL = new ThreadLocal<>();
     private String masterKey = "master";
     /**
      * 从库keys
@@ -62,7 +62,7 @@ public class LuavaMultiDataSource extends AbstractRoutingDataSource {
      * 标记主库
      */
     public void markMaster() {
-        this.contextHolder.set(this.masterKey);
+        this.CURRENT_DATASOURCE_KEY_TL.set(this.masterKey);
         if (logger.isDebugEnabled()) {
             logger.debug("switch master datasource");
         }
@@ -76,14 +76,14 @@ public class LuavaMultiDataSource extends AbstractRoutingDataSource {
             this.markMaster();
         } else {
             synchronized (this) {
-                this.contextHolder.set(this.slaveDataSourceKeys.get(this.keyIndex));
+                this.CURRENT_DATASOURCE_KEY_TL.set(this.slaveDataSourceKeys.get(this.keyIndex));
                 this.keyIndex++;
                 if (this.keyIndex >= this.slaveDataSourceKeys.size()) {
                     this.keyIndex = 0;
                 }
             }
             if (logger.isDebugEnabled()) {
-                logger.debug("switch {} datasource", this.contextHolder.get());
+                logger.debug("switch {} datasource", this.CURRENT_DATASOURCE_KEY_TL.get());
             }
         }
     }
@@ -98,14 +98,14 @@ public class LuavaMultiDataSource extends AbstractRoutingDataSource {
         if (!this.slaveDataSourceKeys.contains(key)) {
             key = this.masterKey;
         }
-        this.contextHolder.set(key);
+        this.CURRENT_DATASOURCE_KEY_TL.set(key);
         if (logger.isDebugEnabled()) {
             logger.debug("switch {} datasource", key);
         }
     }
 
     public String getDataSourceKey() {
-        String key = this.contextHolder.get();
+        String key = this.CURRENT_DATASOURCE_KEY_TL.get();
         if (key == null) {
             key = this.masterKey;
             this.markMaster();
