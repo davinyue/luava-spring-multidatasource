@@ -2,7 +2,7 @@
 spring多数据源
 # 如何使用
 ## 1. maven引入
-```
+```xml
 <dependency>
   <groupId>org.linuxprobe</groupId>
   <artifactId>luava-spring-multidatasource</artifactId>
@@ -10,7 +10,7 @@ spring多数据源
 </dependency>
 ```
 ## 2. yml配置
-```
+```yaml
 spring:
   datasources:
     # master库必须有,下面的从库可以没有
@@ -33,7 +33,7 @@ spring:
       driverClassName: com.mysql.cj.jdbc.Driver
 ```
 ## 3. spring boot java bean配置(spring + spring mvc 也可自行转换为xml配置)
-```
+```java
 import java.util.Map;
 
 import MultiDataSource;
@@ -79,7 +79,7 @@ public class DataSourceConfiguration {
 2. 当slave为true时, 标记使用从库, 此时mater的值将失效, 如何有多个从库, 将轮询使用每个从库来达到负载均衡;
 3. 当value的值不为空时, slave和master的值将失效, 切换到用户指定的数据源.
 
-```
+```java
 package org.linuxprobe.universalcrudspringbootdemo.controller;
 
 import org.linuxprobe.crud.core.query.Page;
