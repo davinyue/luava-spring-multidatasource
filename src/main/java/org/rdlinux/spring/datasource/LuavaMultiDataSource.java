@@ -1,54 +1,67 @@
 package org.rdlinux.spring.datasource;
 
+import org.rdlinux.spring.datasource.event.SwitchDataSourceEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationListener;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+import org.springframework.util.Assert;
 
-import java.util.LinkedList;
+import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class LuavaMultiDataSource extends AbstractRoutingDataSource {
-    private final static Logger logger = LoggerFactory.getLogger(LuavaMultiDataSource.class);
+public class LuavaMultiDataSource extends AbstractRoutingDataSource implements ApplicationListener<SwitchDataSourceEvent> {
+    private final static Logger log = LoggerFactory.getLogger(LuavaMultiDataSource.class);
     private final ThreadLocal<String> CURRENT_DATASOURCE_KEY_TL = new ThreadLocal<>();
     private String masterKey = "master";
     /**
      * 从库keys
      */
     private List<String> slaveDataSourceKeys;
+    /**
+     * 当前从库使用下标
+     */
+    private volatile int keyIndex = 0;
 
-    private int keyIndex = 0;
-
-    public LuavaMultiDataSource(String masterKey, Map<Object, Object> targetDataSources) {
-        this.setTargetDataSources(targetDataSources);
+    /**
+     * 构造函数
+     *
+     * @param masterKey         指定主数据源的名称
+     * @param targetDataSources 指定数据源名称与数据源的映射
+     */
+    @SuppressWarnings("unchecked")
+    public LuavaMultiDataSource(String masterKey, Map<String, DataSource> targetDataSources) {
+        this.setTargetDataSources((Map<Object, Object>) ((Map<?, ?>) targetDataSources));
         if (masterKey != null && !masterKey.isEmpty()) {
             this.masterKey = masterKey;
         }
     }
 
-    public LuavaMultiDataSource(String masterKey) {
-        this(masterKey, null);
-    }
-
+    /**
+     * 初始化从库
+     */
     public void initSlaveDataSourceKeys(Map<Object, Object> targetDataSources) {
         if (targetDataSources.get(this.masterKey) == null) {
             throw new IllegalArgumentException(this.masterKey + " datasource can not be null");
         }
-        this.slaveDataSourceKeys = new LinkedList<>();
         Set<Object> keys = targetDataSources.keySet();
-        for (Object key : keys) {
-            if (!this.masterKey.equals(key.toString())) {
-                this.slaveDataSourceKeys.add(key.toString());
+        int salveNum = keys.size() - 1;
+        if (salveNum > 0) {
+            this.slaveDataSourceKeys = new ArrayList<>(salveNum);
+            for (Object key : keys) {
+                if (!this.masterKey.equals(key.toString())) {
+                    this.slaveDataSourceKeys.add(key.toString());
+                }
             }
         }
     }
 
     @Override
     public void setTargetDataSources(Map<Object, Object> targetDataSources) {
-        if (targetDataSources == null || targetDataSources.isEmpty()) {
-            throw new IllegalArgumentException("targetDataSources can not be null");
-        }
+        Assert.notEmpty(targetDataSources, "targetDataSources can not be null");
         super.setTargetDataSources(targetDataSources);
         this.initSlaveDataSourceKeys(targetDataSources);
     }
@@ -63,8 +76,8 @@ public class LuavaMultiDataSource extends AbstractRoutingDataSource {
      */
     public void markMaster() {
         this.CURRENT_DATASOURCE_KEY_TL.set(this.masterKey);
-        if (logger.isDebugEnabled()) {
-            logger.debug("switch master datasource");
+        if (log.isDebugEnabled()) {
+            log.debug("switch master datasource");
         }
     }
 
@@ -82,8 +95,8 @@ public class LuavaMultiDataSource extends AbstractRoutingDataSource {
                     this.keyIndex = 0;
                 }
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("switch {} datasource", this.CURRENT_DATASOURCE_KEY_TL.get());
+            if (log.isDebugEnabled()) {
+                log.debug("switch {} datasource", this.CURRENT_DATASOURCE_KEY_TL.get());
             }
         }
     }
@@ -99,8 +112,8 @@ public class LuavaMultiDataSource extends AbstractRoutingDataSource {
             key = this.masterKey;
         }
         this.CURRENT_DATASOURCE_KEY_TL.set(key);
-        if (logger.isDebugEnabled()) {
-            logger.debug("switch {} datasource", key);
+        if (log.isDebugEnabled()) {
+            log.debug("switch {} datasource", key);
         }
     }
 
@@ -111,5 +124,10 @@ public class LuavaMultiDataSource extends AbstractRoutingDataSource {
             this.markMaster();
         }
         return key;
+    }
+
+    @Override
+    public void onApplicationEvent(SwitchDataSourceEvent event) {
+        this.markByKey(event.getSource());
     }
 }

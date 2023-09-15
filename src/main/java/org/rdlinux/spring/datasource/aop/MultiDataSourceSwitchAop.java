@@ -11,10 +11,10 @@ import org.rdlinux.spring.datasource.annotation.DataSourceSwitch;
 import javax.annotation.PostConstruct;
 
 @Aspect
-public class LuavaMultiDataSourceSwitchAop {
+public class MultiDataSourceSwitchAop {
     private LuavaMultiDataSource multiDataSource;
 
-    public LuavaMultiDataSourceSwitchAop(LuavaMultiDataSource multiDataSource) {
+    public MultiDataSourceSwitchAop(LuavaMultiDataSource multiDataSource) {
         this.setMultiDataSource(multiDataSource);
     }
 
