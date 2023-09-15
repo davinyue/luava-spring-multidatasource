@@ -64,7 +64,7 @@ public class DataSourceConfiguration {
 
         // 配置切面
 	@Bean
-	public MultiDataSourceSwitchAop dataSourceAop(MultiDataSource multiDataSource) {
+	public MultiDataSourceSwitchAop dataSourceAop(LuavaMultiDataSource multiDataSource) {
 		return new MultiDataSourceSwitchAop(multiDataSource);
 	}
         // 配置事务管理
