@@ -6,7 +6,7 @@ spring多数据源
 <dependency>
   <groupId>org.linuxprobe</groupId>
   <artifactId>luava-spring-multidatasource</artifactId>
-  <version>0.0.2.RELEASE</version>
+  <version>0.0.3.RELEASE</version>
 </dependency>
 ```
 ## 2. yml配置
@@ -58,18 +58,18 @@ public class DataSourceConfiguration {
         // 配置数据源
 	@SuppressWarnings("unchecked")
 	@Bean
-	public MultiDataSource multiDataSource() {
-		return new MultiDataSource((Map<Object, Object>) ((Map<?, ?>) datasources));
+	public LuavaMultiDataSource multiDataSource() {
+		return new LuavaMultiDataSource(datasources));
 	}
 
         // 配置切面
 	@Bean
-	public DataSourceAop dataSourceAop(MultiDataSource multiDataSource) {
-		return new DataSourceAop(multiDataSource);
+	public MultiDataSourceSwitchAop dataSourceAop(MultiDataSource multiDataSource) {
+		return new MultiDataSourceSwitchAop(multiDataSource);
 	}
         // 配置事务管理
 	@Bean
-	DataSourceTransactionManager transactionManager(MultiDataSource multiDataSource) {
+	DataSourceTransactionManager transactionManager(LuavaMultiDataSource multiDataSource) {
 		return new DataSourceTransactionManager(multiDataSource);
 	}
 }
@@ -120,3 +120,6 @@ public class PermissionController {
 }
 
 ```
+
+## 5. 发送事件切换数据源
+可以向spring容器发送SwitchDataSourceEvent事件来切换数据源
