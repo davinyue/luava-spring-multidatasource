@@ -14,9 +14,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class LuavaMultiDataSource extends AbstractRoutingDataSource implements ApplicationListener<SwitchDataSourceEvent> {
+    public static final String DEFAULT_MASTER_KEY = "master";
     private final static Logger log = LoggerFactory.getLogger(LuavaMultiDataSource.class);
     private final ThreadLocal<String> CURRENT_DATASOURCE_KEY_TL = new ThreadLocal<>();
-    private String masterKey = "master";
+    private String masterKey;
     /**
      * 从库keys
      */
@@ -34,10 +35,19 @@ public class LuavaMultiDataSource extends AbstractRoutingDataSource implements A
      */
     @SuppressWarnings("unchecked")
     public LuavaMultiDataSource(String masterKey, Map<String, DataSource> targetDataSources) {
-        this.setTargetDataSources((Map<Object, Object>) ((Map<?, ?>) targetDataSources));
         if (masterKey != null && !masterKey.isEmpty()) {
             this.masterKey = masterKey;
         }
+        this.setTargetDataSources((Map<Object, Object>) ((Map<?, ?>) targetDataSources));
+    }
+
+    /**
+     * 构造函数
+     *
+     * @param targetDataSources 指定数据源名称与数据源的映射
+     */
+    public LuavaMultiDataSource(Map<String, DataSource> targetDataSources) {
+        this(DEFAULT_MASTER_KEY, targetDataSources);
     }
 
     /**
