@@ -55,19 +55,20 @@ import lombok.Setter;
 public class DataSourceConfiguration {
 	private Map<String, HikariDataSource> datasources;
 
-        // 配置数据源
+	/** 配置数据源 */
 	@SuppressWarnings("unchecked")
 	@Bean
 	public LuavaMultiDataSource multiDataSource() {
-		return new LuavaMultiDataSource(datasources));
+		return new LuavaMultiDataSource(datasources);
 	}
 
-        // 配置切面
+	/** 配置切面, 可以通过注解切换数据源, 如果用事件通知的方式, 可以不配置 */
 	@Bean
 	public MultiDataSourceSwitchAop dataSourceAop(LuavaMultiDataSource multiDataSource) {
 		return new MultiDataSourceSwitchAop(multiDataSource);
 	}
-        // 配置事务管理
+	
+    /** 配置事务管理 */
 	@Bean
 	DataSourceTransactionManager transactionManager(LuavaMultiDataSource multiDataSource) {
 		return new DataSourceTransactionManager(multiDataSource);
@@ -97,21 +98,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class PermissionController {
 	@Autowired
 	private PermissonService service;
-        // 标记从库,会启用负载均衡
+	/** 标记从库,会启用负载均衡(轮询策略) */
 	@GetMapping("/getPageInfo")
 	@DataSourceSwitch(slave = true)
 	public Page<Permission> getPageInfo(PermissionQuery param) {
 		return this.service.getPageInfo(param);
 	}
 
-        // 标记主库
+    /** 标记主库 */
 	@GetMapping("/getPageInfo2")
 	@DataSourceSwitch
 	public Page<Permission> getPageInfo2(PermissionQuery param) {
 		return this.service.getPageInfo(param);
 	}
 	
-	// 标记指定库
+	/** 标记指定库 */
 	@GetMapping("/getPageInfo3")
 	@DataSourceSwitch(value = "slave1")
 	public Page<Permission> getPageInfo3(PermissionQuery param) {
