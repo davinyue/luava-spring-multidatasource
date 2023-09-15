@@ -55,20 +55,20 @@ import lombok.Setter;
 public class DataSourceConfiguration {
 	private Map<String, HikariDataSource> datasources;
 
-    /** 配置数据源 */
+	/** 配置数据源 */
 	@SuppressWarnings("unchecked")
 	@Bean
 	public LuavaMultiDataSource multiDataSource() {
 		return new LuavaMultiDataSource(datasources);
 	}
 
-    /** 配置切面, 可以通过注解切换数据源, 如果用事件通知的方式, 可以不配置 */
+	/** 配置切面, 可以通过注解切换数据源, 如果用事件通知的方式, 可以不配置 */
 	@Bean
 	public MultiDataSourceSwitchAop dataSourceAop(LuavaMultiDataSource multiDataSource) {
 		return new MultiDataSourceSwitchAop(multiDataSource);
 	}
 	
-    /** 配置事务管理 */
+	/** 配置事务管理 */
 	@Bean
 	DataSourceTransactionManager transactionManager(LuavaMultiDataSource multiDataSource) {
 		return new DataSourceTransactionManager(multiDataSource);
@@ -105,7 +105,7 @@ public class PermissionController {
 		return this.service.getPageInfo(param);
 	}
 
-    /** 标记主库 */
+	/** 标记主库 */
 	@GetMapping("/getPageInfo2")
 	@DataSourceSwitch
 	public Page<Permission> getPageInfo2(PermissionQuery param) {
