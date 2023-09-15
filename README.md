@@ -55,14 +55,14 @@ import lombok.Setter;
 public class DataSourceConfiguration {
 	private Map<String, HikariDataSource> datasources;
 
-	/** 配置数据源 */
+    /** 配置数据源 */
 	@SuppressWarnings("unchecked")
 	@Bean
 	public LuavaMultiDataSource multiDataSource() {
 		return new LuavaMultiDataSource(datasources);
 	}
 
-	/** 配置切面, 可以通过注解切换数据源, 如果用事件通知的方式, 可以不配置 */
+    /** 配置切面, 可以通过注解切换数据源, 如果用事件通知的方式, 可以不配置 */
 	@Bean
 	public MultiDataSourceSwitchAop dataSourceAop(LuavaMultiDataSource multiDataSource) {
 		return new MultiDataSourceSwitchAop(multiDataSource);
