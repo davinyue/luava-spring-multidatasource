@@ -35,7 +35,7 @@
 
     <groupId>org.rdlinux</groupId>
     <artifactId>luava-spring-multidatasource</artifactId>
-    <version>0.0.3.RELEASE</version>
+    <version>0.0.4.RELEASE</version>
     <packaging>jar</packaging>
     <name>luava-spring-multidatasource</name>
     <description>luava-spring-multidatasource</description>

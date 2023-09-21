@@ -118,7 +118,7 @@ public class LuavaMultiDataSource extends AbstractRoutingDataSource implements A
         if (key == null || key.isEmpty()) {
             throw new IllegalArgumentException("key can not be null");
         }
-        if (!this.slaveDataSourceKeys.contains(key)) {
+        if (this.slaveDataSourceKeys == null || !this.slaveDataSourceKeys.contains(key)) {
             key = this.masterKey;
         }
         this.CURRENT_DATASOURCE_KEY_TL.set(key);
