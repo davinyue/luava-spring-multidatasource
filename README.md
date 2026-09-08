@@ -4,9 +4,9 @@ spring多数据源
 ## 1. maven引入
 ```xml
 <dependency>
-  <groupId>org.linuxprobe</groupId>
-  <artifactId>luava-spring-multidatasource</artifactId>
-  <version>0.0.3.RELEASE</version>
+    <groupId>org.rdlinux</groupId>
+    <artifactId>luava-spring-multidatasource</artifactId>
+    <version>0.0.4.RELEASE</version>
 </dependency>
 ```
 ## 2. yml配置
